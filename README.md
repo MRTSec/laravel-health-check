@@ -31,6 +31,15 @@ php artisan vendor:publish --provider="MRTSec\HealthCheck\HealthCheckServiceProv
 This will create a `health-check.php` file in your `config` directory. Here's an explanation of the configuration options:
 
 ```php
+<?php
+
+use MRTSec\HealthCheck\Checkers\DatabaseConnectionChecker;
+use MRTSec\HealthCheck\Checkers\DatabaseQueryChecker;
+use MRTSec\HealthCheck\Checkers\MigrationStatusChecker;
+use MRTSec\HealthCheck\Checkers\CacheChecker;
+use MRTSec\HealthCheck\Checkers\DiskSpaceChecker;
+use MRTSec\HealthCheck\Checkers\LogFileChecker;
+
 return [
     // The route prefix for the health check page
     'route_prefix' => 'health',
@@ -39,10 +48,11 @@ return [
     'middleware' => ['web'],
 
     // Define your health checks here
-    'checks' => [
-        'We have an active database connection' => function () {
-            return \DB::connection()->getPdo() ? true : false;
-        },
+    'checkers' => [
+        'Database Connection' => [
+            'class' => DatabaseConnectionChecker::class,
+            'config' => [],
+        ],
         [...]
     ],
 ];
@@ -50,18 +60,41 @@ return [
 
 ### Customizing Checks
 
-You can add, remove, or modify the health checks in the `checks` array. Each check is a key-value pair where the key is the description of the check, and the value is a closure that returns `true` for a passed check and `false` for a failed check.
+You can add, remove, or modify the health checks in the `checkers` array. Each check is defined by a key-value pair where:
+- The key is the name of the check displayed on the health check page.
+- The value is an array containing:
+  - `class`: The fully qualified class name of the checker.
+  - `config`: An array of configuration options specific to that checker.
 
-Example of adding a custom check:
+To add a custom check:
+
+1. Create a new checker class that implements the `MRTSec\HealthCheck\Contracts\HealthCheckerInterface`.
+2. Add your checker to the `checkers` array in the configuration file.
+
+Example of adding a custom checker:
 
 ```php
-'checks' => [
-    // ... existing checks ...
-    'My Custom Service is running' => function () {
-        return MyCustomService::isRunning();
-    },
+use App\HealthCheckers\MyCustomServiceChecker;
+
+'checkers' => [
+    // ... existing checkers ...
+    'My Custom Service' => [
+        'class' => MyCustomServiceChecker::class,
+        'config' => [
+            // Any configuration your checker might need
+        ],
+    ],
 ],
 ```
+
+## Available Checkers
+
+- **DatabaseConnectionChecker**: Verifies the database connection.
+- **DatabaseQueryChecker**: Performs a simple database query.
+- **MigrationStatusChecker**: Checks if all migrations are up to date.
+- **CacheChecker**: Verifies that the cache system is working.
+- **DiskSpaceChecker**: Checks available disk space.
+- **LogFileChecker**: Ensures the log file is writable.
 
 ## Changelog
 
