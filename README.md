@@ -6,14 +6,14 @@
 
 | Health Check Passed | We Have Some issues |
 |--|--|
-| ![Screenshot - Passed](https://zupimages.net/up/24/37/shwh.png)  | ![Screenshot Failed](https://zupimages.net/up/24/37/s4u1.png) |
+| ![Screenshot - Passed](https://zupimages.net/up/24/37/shwh.png) | ![Screenshot Failed](https://zupimages.net/up/24/37/s4u1.png) |
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require  mrtsec/laravel-health-check
+composer require mrtsec/laravel-health-check
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ After installation, you can access the health check page at `/health`.
 Publish the configuration file:
 
 ```bash
-php  artisan  vendor:publish  --provider="MRTSec\HealthCheck\HealthCheckServiceProvider"  --tag="config"
+php artisan vendor:publish --provider="MRTSec\HealthCheck\HealthCheckServiceProvider" --tag="config"
 ```
 
 This will create a `health-check.php` file in your `config` directory. Here's an explanation of the configuration options:
@@ -62,7 +62,7 @@ Example of adding a custom check:
     },
 ],
 ```
-  
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
