@@ -25,7 +25,7 @@ After installation, you can access the health check page at `/health`.
 Publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="MRTSec\HealthCheck\HealthCheckServiceProvider" --tag="config"
+php artisan vendor:publish --provider="MRTSec\HealthCheck\HealthCheckServiceProvider"
 ```
 
 This will create a `health-check.php` file in your `config` directory. Here's an explanation of the configuration options:
