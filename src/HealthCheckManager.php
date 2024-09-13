@@ -2,39 +2,50 @@
 
 namespace MRTSec\HealthCheck;
 
+use MRTSec\HealthCheck\Contracts\HealthCheckerInterface;
+
 class HealthCheckManager
 {
     protected $app;
+    protected $config;
 
     public function __construct($app)
     {
         $this->app = $app;
+        $this->config = $app['config']['health-check'];
     }
 
     public function runChecks()
     {
-        $checks = config('health-check.checks', []);
         $results = [];
 
-        foreach ($checks as $name => $check) {
-            try {
-                $start = microtime(true);
-                $result = $check();
-                $end = microtime(true);
-                $time = round(($end - $start) * 1000, 1); // Time in milliseconds
+        foreach ($this->config['checkers'] as $name => $checker) {
+            $checkerClass = $checker['class'];
+            $checkerConfig = $checker['config'] ?? [];
 
-                $results[$name] = [
-                    'status' => $result ? 'passed' : 'failed',
-                    'time' => $time . 'ms'
-                ];
-            } catch (\Exception $e) {
-                $results[$name] = [
-                    'status' => 'failed',
-                    'time' => '0.0ms'
-                ];
+            if (!class_exists($checkerClass)) {
+                $results[$name] = $this->createErrorResult("Checker class not found: $checkerClass");
+                continue;
             }
+
+            $checkerInstance = new $checkerClass($checkerConfig);
+
+            if (!$checkerInstance instanceof HealthCheckerInterface) {
+                $results[$name] = $this->createErrorResult("Invalid checker class: $checkerClass");
+                continue;
+            }
+
+            $results[$name] = $checkerInstance->check();
         }
 
         return $results;
+    }
+
+    protected function createErrorResult(string $message): array
+    {
+        return [
+            'status' => 'error',
+            'message' => $message,
+        ];
     }
 }

@@ -3,7 +3,6 @@
 namespace MRTSec\HealthCheck;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
 
 class HealthCheckServiceProvider extends ServiceProvider
 {
@@ -22,23 +21,7 @@ class HealthCheckServiceProvider extends ServiceProvider
             __DIR__.'/../config/health-check.php' => config_path('health-check.php'),
         ], 'health-check-config');
 
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'health-check');
-
-        $this->registerRoutes();
-    }
-
-    protected function registerRoutes()
-    {
-        Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-        });
-    }
-
-    protected function routeConfiguration()
-    {
-        return [
-            'prefix' => config('health-check.route_prefix'),
-            'middleware' => config('health-check.middleware'),
-        ];
     }
 }
