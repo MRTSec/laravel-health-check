@@ -2,6 +2,7 @@
     "name": "mrtsec/laravel-health-check",
     "description": "Health check package for Laravel",
     "type": "library",
+    "version": "1.1.0",
     "license": "MIT",
     "autoload": {
         "psr-4": {
